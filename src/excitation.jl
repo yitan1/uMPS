@@ -1,5 +1,6 @@
+# export excitation, nullspaceforAl
+
 # excitation for two sites hamiltonian 
-export excitation, nullspaceforAl
 
 function excitation(state::UMPS{:MF}, h0, p::Float64, N::Int64; tol = 1e-10)
 

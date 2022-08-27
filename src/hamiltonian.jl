@@ -1,7 +1,5 @@
-export spinmodel, op
+# export spinmodel, op
 
-using LinearAlgebra
-using TensorOperations, KrylovKit
 # two site hamiltonian
 
 struct SiteType{T}
