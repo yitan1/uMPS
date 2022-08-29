@@ -2,7 +2,7 @@
 
 # excitation for two sites hamiltonian 
 
-function excitation(state::UMPS{:MF}, h0, p::Float64, N::Int64; tol = 1e-10)
+function excitation(h0, float(p), state::UMPS{:MF}, N::Int64; tol = 1e-10)
 
     e = expectation(state, h0)
     @show e
@@ -146,7 +146,7 @@ function sumright1(B, p, state::UMPS{:MF}, h, Rh, RB; tol = 1e-10)
     R1
 end
 
-# x*(1 - (T - fp) ) = y  
+# x*(1 - a(T - fp) ) = y  
 function rightapplyTM(x, state::UMPS{:MF}, t::Tag{:rl}, a)
     Al = data(state)[1]
     Ar = data(state)[2]
@@ -159,13 +159,13 @@ function rightapplyTM(x, state::UMPS{:MF}, t::Tag{:rl}, a)
 
     @tensor T[:] := a*Ar[-1,1,-3]* conj(Al)[-2,1,-4]
     x = reshape(x, D, D)
-    @tensor y[:] := x[-1,-2] - x[1,2]*T[1,2,-1,-2] + x[1,2]*rightfp[1, 2]*leftfp[-1,-2]
+    @tensor y[:] := x[-1,-2] - x[1,2]*T[1,2,-1,-2] + a*x[1,2]*rightfp[1, 2]*leftfp[-1,-2]
 
     y = reshape(y, D*D)
     y
 end
 
-# (1 - (T - fp) )x = y  
+# (1 - a(T - fp) )x = y  
 function leftapplyTM(x, state::UMPS{:MF}, t::Tag{:lr}, a)
     Al = data(state)[1]
     Ar = data(state)[2]
@@ -178,7 +178,7 @@ function leftapplyTM(x, state::UMPS{:MF}, t::Tag{:lr}, a)
 
     @tensor T[:] := a*Al[-1,1,-3]* conj(Ar)[-2,1,-4]
     x = reshape(x, D, D)
-    @tensor y[:] := x[-1,-2] - T[-1,-2,1,2]*x[1,2] + rightfp[-1, -2]*leftfp[1,2]*x[1,2]
+    @tensor y[:] := x[-1,-2] - T[-1,-2,1,2]*x[1,2] + a*rightfp[-1, -2]*leftfp[1,2]*x[1,2]
 
     y = reshape(y, D*D)
     y

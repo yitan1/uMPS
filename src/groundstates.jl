@@ -158,11 +158,11 @@ end
 
 
 #########################
-# x*( 1-(T-fp) ) = y  
+# x*( 1-a(T-fp) ) = y  
 leftapplyTM(x, state::UMPS{:MF}, s::AbstractString, a::Float64 = 1.0) = leftapplyTM(x, state, Tag(s), a)
 leftapplyTM(x, state::UMPS{:MF}, s::AbstractString, a::ComplexF64) = leftapplyTM(x, state, Tag(s), a)
 
-# x*( 1-(T-fp) ) = y  
+# x*( 1-a(T-fp) ) = y  
 rightapplyTM(x, state::UMPS{:MF}, s::AbstractString, a::Float64 = 1.0) = rightapplyTM(x, state, Tag(s), a)
 rightapplyTM(x, state::UMPS{:MF}, s::AbstractString, a::ComplexF64) = rightapplyTM(x, state, Tag(s), a)
 
@@ -177,7 +177,7 @@ function leftapplyTM(x, state::UMPS{:MF}, t::Tag{:rr}, a)
 
     @tensor T[:] := a*Ar[-1,1,-3]* conj(Ar)[-2,1,-4]
     x = reshape(x, D, D)
-    @tensor y[:] := x[-1,-2] - T[-1,-2,1,2]*x[1,2] + leftfp[1,2]*x[1,2]*rightfp[-1,-2]
+    @tensor y[:] := x[-1,-2] - T[-1,-2,1,2]*x[1,2] + a*leftfp[1,2]*x[1,2]*rightfp[-1,-2]
 
     y = reshape(y, D*D)
     y
@@ -195,7 +195,7 @@ function rightapplyTM(x, state::UMPS{:MF}, t::Tag{:ll}, a)
 
     @tensor T[:] := a*Al[-1,1,-3]* conj(Al)[-2,1,-4]
     x = reshape(x, D, D)
-    @tensor y[:] := x[-1,-2] - x[1,2]*T[1,2,-1,-2] + x[1,2]*rightfp[1, 2]*leftfp[-1,-2]
+    @tensor y[:] := x[-1,-2] - x[1,2]*T[1,2,-1,-2] + a*x[1,2]*rightfp[1, 2]*leftfp[-1,-2]
 
     y = reshape(y, D*D)
     y
