@@ -2,7 +2,7 @@
 
 # excitation for two sites hamiltonian 
 
-function excitation(h0, float(p), state::UMPS{:MF}, N::Int64; tol = 1e-10)
+function excitation(h0, p::Float64, state::UMPS{:MF}, N::Int64; tol = 1e-10)
 
     e = expectation(state, h0)
     @show e
