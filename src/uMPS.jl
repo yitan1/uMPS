@@ -19,4 +19,7 @@ include("groundstates.jl")
 export excitation, nullspaceforAl
 include("excitation.jl")
 
+include("mpo.jl")
+
+include("groundformpo.jl")
 end
