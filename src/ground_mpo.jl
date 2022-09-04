@@ -19,7 +19,7 @@ function vumps(M::MPO, state::UMPS{:MF}; tol = 1e-10)
         C = data(state)[4]
 
         # @tensor y[:] := fl[1,3,2]*C[1,4]*conj(C)[2,5]*fr[4,3,5]
-        # fl = fl/y[]
+        # @show y
 
         D = size(Ac,1)
         d = size(Ac,2)
