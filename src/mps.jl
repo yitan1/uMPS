@@ -7,21 +7,36 @@
 # Form: uniform(UF): (A)
 # left(right) canonical form(L(R)F), 
 # mixed canonical form(MF): (Al, Ar, Ac, C)
-mutable struct UMPS{Form}
+abstract type AbstractUMPS end
+
+const Tensor{T,N} = Array{T,N}
+
+mutable struct SingleUMPS{Form} <: AbstractUMPS
+    data::Vector{Tensor}
+end
+
+mutable struct MultiUMPS{Form} <: AbstractUMPS
+    data::Vector{SingleUMPS{Form}}
+end
+
+mutable struct UMPS{Form} <: AbstractUMPS
     data
 end
-umps(data, s::AbstractString) = UMPS{Symbol(s)}(data)
 
-data(A::UMPS) = A.data
+data(A::AbstractUMPS) = A.data
 
-function randUMPS end
+umps(data::Tensor) = umps([data], "UF")
 
-randUMPS(D::Int64, d::Int64, s::AbstractString) = randUMPS(D, d, Tag(s))
+umps(data::Vector{<:Tensor}, s::AbstractString)  = SingleUMPS{Symbol(s)}(data)
 
-randUMPS(D::Int64, d::Int64, tag::Tag{:UF}) = UMPS{:UF}(rand(D,d,D))
+# function randUMPS end
 
-function mixed_canonical(state::UMPS{:UF}, C0 = 0; tol = 1e-10)
-    A = data(state)
+rand_singleUMPS(D::Int, d::Int, s::AbstractString) = rand_singleUMPS(D, d, Tag(s))
+
+rand_singleUMPS(D::Int, d::Int, ::Tag{:UF}) = umps(rand(D,d,D))
+
+function mixed_canonical(state::SingleUMPS{:UF}, C0 = 0; tol = 1e-10)
+    A = data(state)[1]
     if C0 == 0
         C0 = diagm(rand(size(A)[3]))
         C0 = C0/norm(C0)
@@ -45,7 +60,7 @@ function mixed_canonical(state::UMPS{:UF}, C0 = 0; tol = 1e-10)
 end
 
 
-function right_canonical(A, R0; tol = 1e-10)
+function right_canonical(A::Tensor, R0::Matrix; tol = 1e-10)
 
     D = size(A, 1)
     
@@ -60,7 +75,7 @@ function right_canonical(A, R0; tol = 1e-10)
 end
 
 
-function left_canonical(A, L0; tol = 1e-10)
+function left_canonical(A::MPS, L0::AbstractMatrix; tol = 1e-10)
     D = size(A, 1)
     d = size(A, 2)
     
@@ -115,7 +130,7 @@ function left_canonical(A, L0; tol = 1e-10)
     Al, L, lambda
 end
 
-function qr_pos(A)
+function qr_pos(A::AbstractMatrix)
 #      QR decomposition with positive diagonal entry    
     Q, R = qr(A);
     D = diagm(sign.(diag(R)))
@@ -125,7 +140,7 @@ function qr_pos(A)
     Q, R
 end
     
-function fixpoint_map(x, A, Al)
+function fixpoint_map(x::AbstractVector, A::Tensor, Al::Tensor)
     D = size(A,1)
     Deff = size(Al,1)
     x = reshape(x, Deff, D)

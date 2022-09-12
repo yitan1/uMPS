@@ -1,12 +1,12 @@
 # find ground state for mpo
 
-function vumps(M::MPO, phi0::UMPS{:UF}; tol = 1e-10)
+function vumps(M::MPO, phi0::SingleUMPS{:UF}; tol = 1e-10)
     state, ~ = mixed_canonical(phi0; tol = tol)
 
     return vumps(M, state; tol = 1e-10)
 end
 
-function vumps(M::MPO, state::UMPS{:MF}; tol = 1e-10)
+function vumps(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10)
 
     maxitr = 1e3
     delta = 1e-14
@@ -50,9 +50,7 @@ function vumps(M::MPO, state::UMPS{:MF}; tol = 1e-10)
     
 end
 
-export leftfixpoint, rightfixpoint
-
-function leftfixpoint(M::MPO, state::UMPS{:MF}; tol = 1e-10) ## MPO is lower triangular form
+function leftfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10) ## MPO is lower triangular form
     Al = data(state)[1]
     C = data(state)[4]  ## compute fixed point
     # Ml = data(M)[1]
@@ -96,7 +94,7 @@ function leftfixpoint(M::MPO, state::UMPS{:MF}; tol = 1e-10) ## MPO is lower tri
     el[], fl
 end
 
-function rightfixpoint(M::MPO, state::UMPS{:MF}; tol = 1e-10)
+function rightfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10)
     Ar = data(state)[2]
     C = data(state)[4]  ## compute fixed point
     Mm = data(M)[2]
@@ -143,7 +141,7 @@ function is_identity(M::AbstractMatrix)
     M == Matrix{eltype(M)}(I, size(M))
 end
 
-function rightapplyTM(x, state::UMPS{:MF}, t::Tag{:directll}, a)  # no need to minus fixed points
+function rightapplyTM(x, state::SingleUMPS{:MF}, ::Tag{:directll}, a)  # no need to minus fixed points
     Al = data(state)[1]
     # Ar = data(state)[2]
 
@@ -157,7 +155,7 @@ function rightapplyTM(x, state::UMPS{:MF}, t::Tag{:directll}, a)  # no need to m
     y
 end
 
-function leftapplyTM(x, state::UMPS{:MF}, t::Tag{:directrr}, a)
+function leftapplyTM(x, state::SingleUMPS{:MF}, ::Tag{:directrr}, a)
     Ar = data(state)[2]
 
     D = size(Ar,1)

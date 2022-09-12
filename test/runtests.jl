@@ -1,62 +1,58 @@
 using uMPS
 using Test
 
+# using Printf
+# Base.show(io::IO, f::Float64) = @printf(io, "%1.4f", f)
+
 @testset "uMPS.jl" begin
     
 end
 
+@testset "mps.jl" begin
+    D, d = 10, 2
+    phi0 = rand_singleUMPS(D, d, "UF")
+    phi1, ~ = mixed_canonical(phi0)
+end
+
 @testset "hamiltonian.jl" begin
-    
+    # op("Sp", "Spinhalf")
+    h0 = spinmodel(1,1,1;s = 1)
 end
 
-# @testset "groundstates.jl" begin
-#     h0 = spinmodel(1,1,1;s = 1)
-
-#     D = 10
-#     d = size(h0,1)
-
-#     phi0 = randUMPS(D,d,"UF")
-
-#     vumps(h0, phi0)
-
-# end
-
-@testset "excitation.jl" begin
-    
-end
-
+@testset "groundstates.jl" begin
     h0 = spinmodel(1,1,1;s = 1)
 
-    D = 24
+    D = 10
     d = size(h0,1)
 
-    phi0 = randUMPS(D,d,"UF")
+    phi0 = rand_singleUMPS(D,d,"UF")
 
-    state, e = vumps(h0, phi0)
+    vumps(h0, phi0)
 
-    wn = Vector(undef,20)
-    for p = 1:20
-        wn[p], X = excitation(state, h0, p*pi/10, 4)
-    end
-# op("Sp", "Spinhalf")
+end
 
-# phi0 = randUMPS(10,2,"UF")
+@testset "excitation.jl" begin
+    h0 = spinmodel(1,1,1;s = 1)
 
-# state, e = vumps(h0, phi0)
-# A = randn(5,2,5)
-# Al, Ar, C = mixed_canonical(A)
+    D = 10
+    d = size(h0,1)
 
-# delta = 1e-10
-# @tensor Ac[:] := Al[-1,-2,1]*C[1,-3]
+    phi0 = rand_singleUMPS(D,d,"UF")
 
-# e0 = expectation(Al, Ar, Ac, h0)
+    phi1, e = vumps(h0, phi0)
 
-# h = h0 - e*identitymatrix(h0)
+    p = 1pi   # momentum 
+    N = 10    # number of excited states
+    En, X = excitation(h0, p, phi1, N)
+end
 
-# Lh = sumleft(Al,C, h)
-# Rh = sumright(Ar, C, h)
+@testset "ground_mpo.jl" begin
+    M = heisenberg() # ::MPO
 
-# ~, Ac0 = eigsolve(x -> HAc(x, Al, Ar, h, Lh, Rh), Ac[:], 1, :SR; issymmetric = false, tol = delta/10)
+    phi0 = rand_singleUMPS(D,d,"UF")
 
-# ~, C0 = eigsolve(x -> Hc(x, Al, Ar, h, Lh, Rh), C[:], 1, :SR; issymmetric = false, tol = delta/10)
+    phi1, e = vumps(M, phi0)
+end
+
+
 

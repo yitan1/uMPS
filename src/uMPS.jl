@@ -10,16 +10,17 @@ include("tag.jl")
 export spinmodel, op
 include("hamiltonian.jl")
 
-export umps, randUMPS, data, mixed_canonical
+export umps, rand_singleUMPS, data, mixed_canonical
 include("mps.jl")
 
-export vumps, expectation, identitymatrix, sumleft, sumright, HAc, Hc, applyTl, getAlAr,applyTr
+export vumps, expectation
 include("groundstates.jl")
 
 export excitation, nullspaceforAl
 include("excitation.jl")
 
+export heisenberg
 include("mpo.jl")
 
-include("groundformpo.jl")
+include("ground_mpo.jl")
 end

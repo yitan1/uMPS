@@ -2,13 +2,13 @@
 
 # vumps for two sites hamiltonian
 
-function vumps(h0, phi0::UMPS{:UF}; tol = 1e-10)
+function vumps(h0::AbstractArray, phi0::SingleUMPS{:UF}; tol = 1e-10)
     state, ~ = mixed_canonical(phi0; tol = tol)
 
     return vumps(h0, state; tol = 1e-10)
 end
 
-function vumps(h0, state::UMPS{:MF}; tol = 1e-10)
+function vumps(h0::AbstractArray, state::SingleUMPS{:MF}; tol = 1e-10)
 
     maxitr = 1e3
     delta = 1e-14
@@ -60,7 +60,7 @@ end
 #   |   |            |
 #   2   4            2
 
-function expectation(state::UMPS{:MF}, h)
+function expectation(state::SingleUMPS{:MF}, h::AbstractArray)
     Al = data(state)[1]
     # Ar = data(state)[2]
     Ac = data(state)[3]
@@ -70,7 +70,7 @@ function expectation(state::UMPS{:MF}, h)
     e[]
 end
 
-function identitymatrix(M)
+function identitymatrix(M::AbstractArray)
     dim = size(M,1)
     locI = diagm(ones(dim))
     
@@ -79,7 +79,7 @@ function identitymatrix(M)
     Im
 end
 
-function HAc(Ac, state::UMPS{:MF}, h, Lh, Rh)
+function HAc(Ac, state::SingleUMPS{:MF}, h, Lh, Rh)
     Al = data(state)[1]
     Ar = data(state)[2]
 
@@ -97,7 +97,7 @@ function HAc(Ac, state::UMPS{:MF}, h, Lh, Rh)
     y[:]
 end
 
-function Hc(C, state::UMPS{:MF}, h, Lh, Rh)
+function Hc(C, state::SingleUMPS{:MF}, h, Lh, Rh)
     Al = data(state)[1]
     Ar = data(state)[2]
 
@@ -115,7 +115,7 @@ function Hc(C, state::UMPS{:MF}, h, Lh, Rh)
     y[:]
 end
 
-function sumleft(state::UMPS{:MF}, h; tol = 1e-10)
+function sumleft(state::SingleUMPS{:MF}, h; tol = 1e-10)
     Al = data(state)[1]
     C = data(state)[4]
 
@@ -136,7 +136,7 @@ function sumleft(state::UMPS{:MF}, h; tol = 1e-10)
     Lh
 end
 
-function sumright(state::UMPS{:MF}, h; tol = 1e-10)
+function sumright(state::SingleUMPS{:MF}, h; tol = 1e-10)
     Ar = data(state)[2]
     C = data(state)[4]
 
@@ -159,14 +159,14 @@ end
 
 #########################
 # x*( 1-a(T-fp) ) = y  
-leftapplyTM(x, state::UMPS{:MF}, s::AbstractString, a::Float64 = 1.0) = leftapplyTM(x, state, Tag(s), a)
-leftapplyTM(x, state::UMPS{:MF}, s::AbstractString, a::ComplexF64) = leftapplyTM(x, state, Tag(s), a)
+leftapplyTM(x, state::SingleUMPS{:MF}, s::AbstractString, a::Float64 = 1.0) = leftapplyTM(x, state, Tag(s), a)
+leftapplyTM(x, state::SingleUMPS{:MF}, s::AbstractString, a::ComplexF64) = leftapplyTM(x, state, Tag(s), a)
 
 # x*( 1-a(T-fp) ) = y  
-rightapplyTM(x, state::UMPS{:MF}, s::AbstractString, a::Float64 = 1.0) = rightapplyTM(x, state, Tag(s), a)
-rightapplyTM(x, state::UMPS{:MF}, s::AbstractString, a::ComplexF64) = rightapplyTM(x, state, Tag(s), a)
+rightapplyTM(x, state::SingleUMPS{:MF}, s::AbstractString, a::Float64 = 1.0) = rightapplyTM(x, state, Tag(s), a)
+rightapplyTM(x, state::SingleUMPS{:MF}, s::AbstractString, a::ComplexF64) = rightapplyTM(x, state, Tag(s), a)
 
-function leftapplyTM(x, state::UMPS{:MF}, t::Tag{:rr}, a)
+function leftapplyTM(x, state::SingleUMPS{:MF}, ::Tag{:rr}, a)
     Ar = data(state)[2]
     C = data(state)[4]
 
@@ -183,7 +183,7 @@ function leftapplyTM(x, state::UMPS{:MF}, t::Tag{:rr}, a)
     y
 end
 
-function rightapplyTM(x, state::UMPS{:MF}, t::Tag{:ll}, a)
+function rightapplyTM(x, state::SingleUMPS{:MF}, ::Tag{:ll}, a)
     Al = data(state)[1]
     # Ar = data(state)[2]
     C = data(state)[4]

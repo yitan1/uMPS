@@ -2,7 +2,7 @@
 
 # excitation for two sites hamiltonian 
 
-function excitation(h0, p::Float64, state::UMPS{:MF}, N::Int64; tol = 1e-10)
+function excitation(h0, p::Float64, state::SingleUMPS{:MF}, N::Int64; tol = 1e-10)
 
     e = expectation(state, h0)
     @show e
@@ -25,7 +25,7 @@ function excitation(h0, p::Float64, state::UMPS{:MF}, N::Int64; tol = 1e-10)
 end
 
 # using left gauge condition
-function Heff(X, VL, p, state::UMPS{:MF}, h, Lh, Rh; tol = 1e-10)
+function Heff(X, VL, p, state::SingleUMPS{:MF}, h, Lh, Rh; tol = 1e-10)
     Al = data(state)[1]
     Ar = data(state)[2]
     D = size(Al, 1)
@@ -91,7 +91,7 @@ function nullspaceforAl(A)
     VL
 end
 
-function sumrightB(B, p, state::UMPS{:MF}; tol = 1e-10)
+function sumrightB(B, p, state::SingleUMPS{:MF}; tol = 1e-10)
     Ar = data(state)[2]
     D = size(Ar, 1)
 
@@ -106,7 +106,7 @@ function sumrightB(B, p, state::UMPS{:MF}; tol = 1e-10)
     RB
 end
 
-function sumleft1(B, p, state::UMPS{:MF}, h, Lh; tol = 1e-10)
+function sumleft1(B, p, state::SingleUMPS{:MF}, h, Lh; tol = 1e-10)
     Al = data(state)[1]
     Ar = data(state)[2]
 
@@ -125,7 +125,7 @@ function sumleft1(B, p, state::UMPS{:MF}, h, Lh; tol = 1e-10)
     L1 
 end
 
-function sumright1(B, p, state::UMPS{:MF}, h, Rh, RB; tol = 1e-10)
+function sumright1(B, p, state::SingleUMPS{:MF}, h, Rh, RB; tol = 1e-10)
     Al = data(state)[1]
     Ar = data(state)[2]
 
@@ -147,7 +147,7 @@ function sumright1(B, p, state::UMPS{:MF}, h, Rh, RB; tol = 1e-10)
 end
 
 # x*(1 - a(T - fp) ) = y  
-function rightapplyTM(x, state::UMPS{:MF}, t::Tag{:rl}, a)
+function rightapplyTM(x, state::SingleUMPS{:MF}, t::Tag{:rl}, a)
     Al = data(state)[1]
     Ar = data(state)[2]
     C = data(state)[4]
@@ -166,7 +166,7 @@ function rightapplyTM(x, state::UMPS{:MF}, t::Tag{:rl}, a)
 end
 
 # (1 - a(T - fp) )x = y  
-function leftapplyTM(x, state::UMPS{:MF}, t::Tag{:lr}, a)
+function leftapplyTM(x, state::SingleUMPS{:MF}, t::Tag{:lr}, a)
     Al = data(state)[1]
     Ar = data(state)[2]
     C = data(state)[4]

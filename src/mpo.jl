@@ -15,7 +15,7 @@
 #     |
 #     1
 struct MPO
-    data
+    data::Vector{Tensor}
 end
 
 data(A::MPO) = A.data
