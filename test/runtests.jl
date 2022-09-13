@@ -34,8 +34,8 @@ end
 
     state, e = vumps(h0, phi0)
 
-    wn = Vector(undef,10)
-    for p = 1:10
+    wn = Vector(undef,20)
+    for p = 1:20
         wn[p], X = excitation(state, h0, p*pi/10, 4)
     end
 # op("Sp", "Spinhalf")
