@@ -20,8 +20,6 @@ end
 
 data(A::MPO) = A.data
 
-export heisenberg
-
 function heisenberg(J = 1, Jz = 1)
     SI = op("SI", "Spinhalf") 
     Sx = op("Sx", "Spinhalf")

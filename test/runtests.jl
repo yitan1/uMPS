@@ -8,11 +8,11 @@ using Test
     
 end
 
-@testset "mps.jl" begin
+# @testset "mps.jl" begin
     D, d = 10, 2
     phi0 = rand_singleUMPS(D, d, "UF")
     phi1, ~ = mixed_canonical(phi0)
-end
+# end
 
 @testset "hamiltonian.jl" begin
     # op("Sp", "Spinhalf")
@@ -53,6 +53,3 @@ end
 
     phi1, e = vumps(M, phi0)
 end
-
-
-

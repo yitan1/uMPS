@@ -19,11 +19,11 @@ mutable struct MultiUMPS{Form} <: AbstractUMPS
     data::Vector{SingleUMPS{Form}}
 end
 
-mutable struct UMPS{Form} <: AbstractUMPS
-    data
-end
+Base.getindex(A::AbstractUMPS, n) = getindex(data(A), n)
 
 data(A::AbstractUMPS) = A.data
+
+# set_data!(A::SingleUMPS, data)
 
 umps(data::Tensor) = umps([data], "UF")
 
@@ -75,7 +75,7 @@ function right_canonical(A::Tensor, R0::Matrix; tol = 1e-10)
 end
 
 
-function left_canonical(A::MPS, L0::AbstractMatrix; tol = 1e-10)
+function left_canonical(A::Tensor, L0::AbstractMatrix; tol = 1e-10)
     D = size(A, 1)
     d = size(A, 2)
     
