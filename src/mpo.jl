@@ -18,7 +18,11 @@ struct MPO
     data::Vector{Tensor}
 end
 
+Base.getindex(A::MPO, n::Int) = data(A)[n]
 data(A::MPO) = A.data
+
+mpo(N::Int) = MPO([ Vector{Tensor}(undef, N), Vector{Tensor}(undef, N), Vector{Tensor}(undef, N)])
+
 
 function heisenberg(J = 1, Jz = 1)
     SI = op("SI", "Spinhalf") 
@@ -42,3 +46,6 @@ function heisenberg(J = 1, Jz = 1)
 
     H = MPO([ml, mm, mr])
 end
+
+#2D MPO
+# 

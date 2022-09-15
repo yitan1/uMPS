@@ -19,21 +19,63 @@ mutable struct MultiUMPS{Form} <: AbstractUMPS
     data::Vector{SingleUMPS{Form}}
 end
 
+Base.size(A::AbstractUMPS) = size(data(A))
+Base.size(::SingleUMPS) = 1
+Base.length(A::AbstractUMPS) = length(data(A))
+
 Base.getindex(A::AbstractUMPS, n) = getindex(data(A), n)
+
+function Base.setindex!(A::AbstractUMPS, v, i::Int)
+    data(A)[i] = v
+end
 
 data(A::AbstractUMPS) = A.data
 
 # set_data!(A::SingleUMPS, data)
 
-umps(data::Tensor) = umps([data], "UF")
+umps(data::Tensor{T,3}) where {T <: Number} = umps([data], "UF")
 
 umps(data::Vector{<:Tensor}, s::AbstractString)  = SingleUMPS{Symbol(s)}(data)
+
+umps(s::AbstractString, N::Int) = MultiUMPS{Symbol(s)}(Vector{SingleUMPS{Symbol(s)}}(undef, N))
 
 # function randUMPS end
 
 rand_singleUMPS(D::Int, d::Int, s::AbstractString) = rand_singleUMPS(D, d, Tag(s))
 
 rand_singleUMPS(D::Int, d::Int, ::Tag{:UF}) = umps(rand(D,d,D))
+
+function rand_singleUMPS(D::Int, d::Int, ::Tag{:MF})
+    Ac = rand(D,d,D)
+    C = diagm(rand(D))
+    C = C/norm(C)
+    Al, Ar = getAlAr(Ac, C)
+
+    umps([Al, Ar, Ac, C], "MF")
+end
+
+function rand_multiUMPS(N::Int, D::Int,d::Int; form = "MF")
+    phi = umps(form, N)
+    Cn = diagm(rand(D)) |> x-> x/norm(x)
+    preC = Cn
+
+    for i = 1:N
+        Ac = rand(D,d,D)
+        if i == N
+            C = Cn
+        else
+            C = diagm(rand(D)) |> x-> x/norm(x)
+        end
+
+        Al, _ , epl, _ = getAlAr(Ac, C)
+        _ , Ar, _, epr = getAlAr(Ac, preC)
+
+        phi[i] = umps([Al,Ar,Ac,C], form)
+
+        preC = C
+    end
+    phi
+end
 
 function mixed_canonical(state::SingleUMPS{:UF}, C0 = 0; tol = 1e-10)
     A = data(state)[1]

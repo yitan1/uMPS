@@ -10,6 +10,7 @@ function vumps(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10)
 
     maxitr = 1e3
     delta = 1e-14
+    e = 0.0
 
     for i = 1:maxitr 
         el, fl = leftfixpoint(M, state)
@@ -24,8 +25,8 @@ function vumps(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10)
         D = size(Ac,1)
         d = size(Ac,2)
 
-        EAc, Ac0 = eigsolve(x -> HmAc(x, state, M, fl, fr), D*d*D, 1, :SR)
-        Ec, C0 = eigsolve(x -> Hmc(x, state, M, fl, fr), D*D, 1, :SR)
+        EAc, Ac0 = eigsolve(x -> HmAc(x, M[2], fl, fr), D*d*D, 1, :SR)
+        Ec, C0 = eigsolve(x -> Hmc(x, fl, fr), D*D, 1, :SR)
 
         Ac = reshape(Ac0[1], size(Ac))
         C = reshape(C0[1], size(C))
@@ -39,14 +40,15 @@ function vumps(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10)
 
         @show i, EAc[1], Ec[1], el, er, delta
         if delta < tol
-            @show i, el, delta
+            e = el
+            @show i, e, delta
             break
         end
     end
 
     # e = expectation(state, h0)
 
-    # state, e
+    state, e
     
 end
 
@@ -59,7 +61,7 @@ function leftfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10) ## MPO is low
     dm = size(Mm, 1)
 
     @tensor T[:] := Al[-1,1,-4]*Mm[-2,2,-5,1]*conj(Al)[-3,2,-6] 
-    fl = zeros(D,dm,D)
+    fl = zeros(eltype(Mm), D,dm,D)
     fl[:,dm,:] = diagm(ones(D))
 
     el = fill(0., ())
@@ -71,7 +73,7 @@ function leftfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10) ## MPO is low
             YLa += tem
         end
         
-        if iszero(Mm[a,:,a,:])
+        if reduce(*, isapprox.(0.0, Mm[a,:,a,:]; atol=1e-10) )
             fl[:,a,:] = YLa
         elseif is_identity(Mm[a,:,a,:])
             leftfp = diagm(ones(D)) # left fixed point of transfer matrix T with left gauge 
@@ -84,7 +86,7 @@ function leftfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10) ## MPO is low
             # compute energy
             @tensor el[:] = YLa[1,2]*rightfp[1,2]
         else   ## Mm(a,a) = λ I
-            lambda = Mm(a,1,a,1)
+            lambda = Mm[a,1,a,1]
             La, ~ = linsolve(x -> rightapplyTM(x, state, "directll", lambda), YLa[:]; tol = tol)
 
             fl[:,a,:] = reshape(La, D, D)
@@ -94,6 +96,8 @@ function leftfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10) ## MPO is low
     el[], fl
 end
 
+
+
 function rightfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10)
     Ar = data(state)[2]
     C = data(state)[4]  ## compute fixed point
@@ -102,7 +106,7 @@ function rightfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10)
     dm = size(Mm, 1)
 
     @tensor T[:] := Ar[-1,1,-4]*Mm[-2,2,-5,1]*conj(Ar)[-3,2,-6] 
-    fr = zeros(D,dm,D)
+    fr = zeros(eltype(Mm), D,dm,D)
     fr[:,1,:] = Matrix{Float64}(I, D, D)
 
     er = fill(0., ())
@@ -114,7 +118,7 @@ function rightfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10)
             YRa += tem
         end
 
-        if iszero(Mm[a,:,a,:])
+        if  reduce(*, isapprox.(0.0, Mm[a,:,a,:]; atol=1e-10) )
             fr[:,a,:] = YRa
         elseif is_identity(Mm[a,:,a,:])
             @tensor leftfp[:] :=  C[1,-1]*conj(C)[1,-2] # left fixed point of transfer matrix T with left gauge 
@@ -127,7 +131,8 @@ function rightfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10)
             # compute energy
             @tensor er[:] = leftfp[1,2]*YRa[1,2]
         else  ## Mm(a,a) = λ I
-            lambda = Mm(a,1,a,1)
+            @show a
+            lambda = Mm[a,1,a,1]
             Ra, ~ = linsolve(x -> rightapplyTM(x, state, "directrr", lambda), YRa[:]; tol = tol)
 
             fr[:,a,:] = reshape(Ra, D, D)
@@ -139,6 +144,7 @@ end
 
 function is_identity(M::AbstractMatrix)
     M == Matrix{eltype(M)}(I, size(M))
+    # isapprox(M, Matrix{eltype(M)}(I, size(M)); atol = 1e-10) 
 end
 
 function rightapplyTM(x, state::SingleUMPS{:MF}, ::Tag{:directll}, a)  # no need to minus fixed points
@@ -168,24 +174,20 @@ function leftapplyTM(x, state::SingleUMPS{:MF}, ::Tag{:directrr}, a)
     y
 end
 
-function HmAc(Ac, state, M, fl, fr)
-    Al = data(state)[1]
-    Mm = data(M)[2]
+function HmAc(Ac, Mm, fl, fr)
+    # Al = data(state)[1]
+    # Mm = data(M)[2]
 
-    Ac = reshape(Ac, size(Al))
+    Ac = reshape(Ac, size(fl,1), size(Mm,4), size(fr, 1))
 
     @tensor y[:] := Ac[1,3,4]*fl[1,2,-1]*Mm[2,-2,5,3]*fr[4,5,-3]
 
     y[:]
 end
 
-function Hmc(C, state, M, fl, fr)
-    Al = data(state)[1]
-    D = size(Al,1) 
+function Hmc(C, fl, fr)
 
-    Mm = data(M)[2]
-    
-    C = reshape(C, D, D)
+    C = reshape(C, size(fl, 1), size(fr, 1))
 
     @tensor y[:] := fl[1,2,-1]*C[1,3]*fr[3,2,-2]
 
