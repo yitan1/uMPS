@@ -64,7 +64,7 @@ function leftfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10) ## MPO is low
     fl = zeros(eltype(Mm), D,dm,D)
     fl[:,dm,:] = diagm(ones(D))
 
-    el = fill(0., ())
+    el = convert(eltype(Mm),0.) |> x -> fill(x, ())
     
     for a = (dm-1):-1:1
         YLa = zeros(D,D)
@@ -109,7 +109,7 @@ function rightfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10)
     fr = zeros(eltype(Mm), D,dm,D)
     fr[:,1,:] = Matrix{Float64}(I, D, D)
 
-    er = fill(0., ())
+    er = convert(eltype(Mm),0.) |> x -> fill(x, ())
 
     for a = 2:dm
         YRa = zeros(D,D)
@@ -143,8 +143,8 @@ function rightfixpoint(M::MPO, state::SingleUMPS{:MF}; tol = 1e-10)
 end
 
 function is_identity(M::AbstractMatrix)
-    M == Matrix{eltype(M)}(I, size(M))
-    # isapprox(M, Matrix{eltype(M)}(I, size(M)); atol = 1e-10) 
+    # M == Matrix{eltype(M)}(I, size(M))
+    isapprox(M, Matrix{eltype(M)}(I, size(M)); atol = 1e-10) 
 end
 
 function rightapplyTM(x, state::SingleUMPS{:MF}, ::Tag{:directll}, a)  # no need to minus fixed points

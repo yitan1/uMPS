@@ -21,11 +21,14 @@ function vumps(M::MPO, phi::MultiUMPS{:MF}; tol = 1e-10)
 
             Ln1 = leftsumN(n+1, phi, M, fl)
 
+            D = size(Ln, 1)
+            d = size(M[2][n], 4)
+
             EAc, Ac0 = eigsolve(x -> HmAc(x, M[2][n], Ln, Rn), D*d*D, 1, :SR)
             Ec, C0 = eigsolve(x -> Hmc(x, Ln1, Rn), D*D, 1, :SR)
 
-            Ac = reshape(Ac0[1], size(Ac))
-            C = reshape(C0[1], size(C))
+            Ac = reshape(Ac0[1], D,d,D)
+            C = reshape(C0[1], D,D)
             
             phi[n][3] = Ac
             phi[n][4] = C
@@ -84,7 +87,7 @@ function trans_to_single(M::MPO, phi::MultiUMPS{:MF}; tol = 1e-10)
         vecAr = reshape(vecAr, dimvecAr[1], dimvecAr[2]*dimvecAr[3], dimvecAr[4] )
 
         Mi = M[2][i]
-        @tensor vecM[:] := vecM[-1,-2,1,-6]*Mi[1,-3,-4,-5]
+        @tensor vecM[:] := vecM[-1,-2,1,-5]*Mi[1,-3,-4,-6]
         dimvecM = size(vecM)
         vecM = reshape(vecM, dimvecM[1], dimvecM[2]*dimvecM[3], dimvecM[4], dimvecM[5]*dimvecM[6])
     end
