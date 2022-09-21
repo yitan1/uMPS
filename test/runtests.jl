@@ -79,3 +79,7 @@ C = phi1[4]
 
 @tensor y[:] := Al[-1,-2,1]*C[1,-3] - C[-1,1]*Ar[1,-2,-3]
 norm(y)
+
+A = Array{Array}(undef,8)
+A[1] = rand(3)
+AA[2] = ["a", "b"]
