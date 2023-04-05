@@ -5,21 +5,27 @@
 function excitation(h0, p::Float64, state::UMPS{:MF}, N::Int64; tol = 1e-10)
 
     e = expectation(state, h0)
-    @show e
+    # println("The momentum k is $p")
+    # println("The energy of ground state is $e")
+
+    println("Renormlize hamiltonian: ")
     h = h0 - e*identitymatrix(h0) 
 
     Lh = sumleft(state, h)
     Rh = sumright(state, h)
 
+    println("Start to compute nullspace:")
     Al = data(state)[1] ## dim: D*d*D 
-    VL = nullspaceforAl(Al)  ## dim: D*d*D(d-1)
+    VL = nullspaceforAl(Al)  ## dim: D*D(d-1)
     D = size(Al, 1)
     D2 = size(VL, 3)
     # X0 = zeros(D,D)
 
+    println("Lanzcos: ")
     En, X = eigsolve(x -> Heff(x, VL, p, state, h, Lh, Rh), D2*D, N, :SR)
-    
     X = reshape.(X,D2,D)
+
+    println("The energy of first excited state is $(En[1])")
 
     En, X
 end

@@ -23,13 +23,13 @@ data(A::MPO) = A.data
 export heisenberg
 
 function heisenberg(J = 1, Jz = 1)
-    SI = op("SI", "Spinhalf") 
-    Sx = op("Sx", "Spinhalf")
-    Sy = op("Sy", "Spinhalf")
-    Sz = op("Sz", "Spinhalf")
-    Sp = op("Sp", "Spinhalf")
-    Sm = op("Sm", "Spinhalf")
-    d = 2
+    SI = op("SI", "Spinone") 
+    Sx = op("Sx", "Spinone")
+    Sy = op("Sy", "Spinone")
+    Sz = op("Sz", "Spinone")
+    Sp = op("Sp", "Spinone")
+    Sm = op("Sm", "Spinone")
+    d = size(SI, 1)
     mm = zeros(ComplexF64, 5, d, 5, d)
     mm[1,:,1,:] = SI
     mm[2,:,1,:] = Sp
@@ -39,8 +39,9 @@ function heisenberg(J = 1, Jz = 1)
     mm[5,:,3,:] = J/2*Sp
     mm[5,:,4,:] = J*Jz*Sz
     mm[5,:,5,:] = SI
-    ml = mm[5,:,:,:]
-    mr = permutedims(mm[:,:,1,:],(2,1,3))
+    mm = permutedims(mm, (3,2,1,4))
+    ml = mm[1,:,:,:]
+    mr = permutedims(mm[:,:,5,:],(2,1,3))
 
-    H = MPO([ml, mm, mr])
+    H = MPO(real.([ml, mm, mr]))
 end

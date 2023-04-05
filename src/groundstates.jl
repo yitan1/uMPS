@@ -1,5 +1,6 @@
 # export vumps, expectation, identitymatrix, sumleft, sumright, HAc, Hc, applyTl, getAlAr,applyTr
 
+using Printf
 # vumps for two sites hamiltonian
 
 function vumps(h0, phi0::UMPS{:UF}; tol = 1e-10)
@@ -12,6 +13,8 @@ function vumps(h0, state::UMPS{:MF}; tol = 1e-10)
 
     maxitr = 1e3
     delta = 1e-14
+    println("Maximum iteration： $(maxitr)")
+    @printf("initial delta: %0.4e\n", delta)
 
     for i = 1:maxitr 
         e = expectation(state, h0)
@@ -38,10 +41,10 @@ function vumps(h0, state::UMPS{:MF}; tol = 1e-10)
         delta = max(tol_left, tol_right)
 
         state = umps([Al,Ar,Ac,C], "MF")
-
-        @show i, EAc[1], Ec[1], e, delta
+        # @printf("EAc = %0.4e, Ec = %0.4e\n", EAc[1], Ec[1])
+        @printf("i = %d, e = %0.4f, delta = %0.2e\n", i, e, delta)
         if delta < tol
-            @show i, e, delta
+            @printf("The total iteration %d times and the final error is %0.2e\nThe final energy is %0.4f", i, delta, e)
             break
         end
     end

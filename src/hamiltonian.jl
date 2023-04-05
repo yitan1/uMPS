@@ -50,9 +50,9 @@ op(::OpLabel{:Sp}, ::SiteType{:Spinhalf}) = [0 1; 0 0]
 op(::OpLabel{:Sm}, ::SiteType{:Spinhalf}) = [0 0; 1 0]
 
 # operators of spinone
-op(::OpLabel{:SI}, ::SiteType{:Spinone}) = [1 0 0; 0 1 0; 1 0 0]
-op(::OpLabel{:Sx}, ::SiteType{:Spinone}) = [0 1.0 0; 1.0 0 1.0; 0 1.0 0]/sqrt(2)
+op(::OpLabel{:SI}, ::SiteType{:Spinone}) = [1 0 0; 0 1 0; 0 0 1]
+op(::OpLabel{:Sx}, ::SiteType{:Spinone}) = [0 1. 0; 1. 0 1.0; 0 1. 0]/sqrt(2)
 op(::OpLabel{:Sy}, ::SiteType{:Spinone}) = [0 -1im 0; 1im 0 -1im; 0 1im 0]/sqrt(2)
-op(::OpLabel{:Sz}, ::SiteType{:Spinone}) = [1.0 0 0; 0 0 0; 0 0 -1.0]
-# op(::OpLabel{:Sp}, ::SiteType{:Spinone}) = [0 1; 0 0]
-# op(::OpLabel{:Sm}, ::SiteType{:Spinone}) = [0 0; 1 0]
+op(::OpLabel{:Sz}, ::SiteType{:Spinone}) = [1. 0 0; 0 0 0; 0 0 -1.0]
+op(::OpLabel{:Sp}, ::SiteType{:Spinone}) = real(op("Sx", "Spinone") + 1im*op("Sy", "Spinone"))
+op(::OpLabel{:Sm}, ::SiteType{:Spinone}) = real(op("Sx", "Spinone") - 1im*op("Sy", "Spinone"))

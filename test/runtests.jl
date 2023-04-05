@@ -25,19 +25,23 @@ end
     
 end
 
-    h0 = spinmodel(1,1,1;s = 1)
+    h0 = spinmodel(1,1,1;s = 1);
 
-    D = 24
-    d = size(h0,1)
+    D = 24;
+    d = size(h0,1);
 
-    phi0 = randUMPS(D,d,"UF")
+    phi0 = randUMPS(D,d,"UF");
 
-    state, e = vumps(h0, phi0)
+    gstate , e = vumps(h0, phi0);
 
-    wn = Vector(undef,20)
-    for p = 1:20
-        wn[p], X = excitation(state, h0, p*pi/10, 4)
-    end
+    M = heisenberg();
+    gstate1, e1 = vumps(M, phi0);
+    expectation(gstate1, h0)
+
+    state, ~ = mixed_canonical(phi0);
+    # el, fl = leftfixpoint(M, state)
+    el, ~ = leftfixpoint1(M, gstate1)
+
 # op("Sp", "Spinhalf")
 
 # phi0 = randUMPS(10,2,"UF")
