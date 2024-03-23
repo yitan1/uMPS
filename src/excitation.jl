@@ -19,15 +19,15 @@ function excitation(h0, p::Float64, state::UMPS{:MF}, N::Int64; tol = 1e-10)
     VL = nullspaceforAl(Al)  ## dim: D*D(d-1)
     D = size(Al, 1)
     D2 = size(VL, 3)
-    # X0 = zeros(D,D)
+    X0 = randn(eltype(VL), D2*D)
 
-    println("Lanzcos: ")
-    En, X = eigsolve(x -> Heff(x, VL, p, state, h, Lh, Rh), D2*D, N, :SR)
+    println("Lanzcos: D2 = $D2, D = $D, N = $N")
+    En, X = eigsolve(x -> Heff(x, VL, p, state, h, Lh, Rh), X0, N, :SR; krylovdim = N)
     X = reshape.(X,D2,D)
 
     println("The energy of first excited state is $(En[1])")
 
-    En, X
+    En, X, VL
 end
 
 # using left gauge condition

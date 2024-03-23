@@ -96,6 +96,7 @@ function HAc(Ac, state::UMPS{:MF}, h, Lh, Rh)
     #diagram 3
     @tensor d4[:] := Ac[-1,-2,1]*Rh[1,-3]
     y = d1 + d2 + d3 + d4
+    # y = d1 + d2
 
     y[:]
 end
@@ -108,12 +109,13 @@ function Hc(C, state::UMPS{:MF}, h, Lh, Rh)
     C = reshape(C, D, D)
     #diagram 1
     @tensor d1[:] := (Al[1,2,7]*conj(Al)[1,3,-1]) * h[2,3,5,6] * (Ar[8,5,4]*conj(Ar)[-2,6,4]) * C[7,8]
-    #diagram 1
+    # diagram 1
     @tensor d2[:] := Lh[1,-1]*C[1,-2]
     #diagram 1
     @tensor d3[:] := C[-1,1]*Rh[1,-2]
     
     y = d1 + d2 + d3
+    # y = d1
     
     y[:]
 end

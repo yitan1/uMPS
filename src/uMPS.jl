@@ -16,8 +16,9 @@ include("mps.jl")
 export vumps, expectation, identitymatrix, sumleft, sumright, HAc, Hc, applyTl, getAlAr,applyTr
 include("groundstates.jl")
 
-export excitation, nullspaceforAl
+export excitation, nullspaceforAl, dsf, dsf_all, broadening
 include("excitation.jl")
+include("DSF.jl")
 
 include("mpo.jl")
 
