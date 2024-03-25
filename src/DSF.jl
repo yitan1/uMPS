@@ -1,4 +1,4 @@
-function broadening(es, swk0; step = 0.1, factor = 0.05, x_max = 0)
+function broadening(es, swk0; step = 0.1, factor = 0.05, x_max = 0, broad = "gauss")
     if x_max > 0
         x_max = x_max
     else
@@ -6,7 +6,11 @@ function broadening(es, swk0; step = 0.1, factor = 0.05, x_max = 0)
     end
     x = 0:step:x_max
 
-    y =  [gauss_broad(x[i], es, swk0, factor) for i in eachindex(x)]
+    if broad == "lor"
+        y =  [lor_broad(x[i], es, swk0, factor) for i in eachindex(x)]
+    elseif broad == "gauss"
+        y =  [gauss_broad(x[i], es, swk0, factor) for i in eachindex(x)]
+    end
     
     x, y
 end
