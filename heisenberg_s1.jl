@@ -87,6 +87,12 @@ for i = 0:0.05:1.0
 end
 fig = Figure()
 ax, hm = heatmap(fig[1,1], xs, ys , log10.(zs), colorrange = (-2,1.5))
+cb = Colorbar(fig[0, 1], hm, height = 25, vertical = false) #height = 20
+rowsize!(fig.layout, 1, Aspect(1, 0.7))\
+# cb.tickalign = 1
+# cb.ticks = -1:1:1
+# cb.ticksize = 10
+# cb.ticklabelsvisible = false
 ylims!(ax, 0, 5)
 fig
 

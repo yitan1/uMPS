@@ -34,7 +34,7 @@ function spinmodel(a = 1, b = 1, c = 1, d = 0 ; s = 1/2)
         Sx = op("Sx", "Spinone")
         Sy = op("Sy", "Spinone")
         Sz = op("Sz", "Spinone")
-        @tensor h[:] := a*Sx[-1,-2]*Sx[-3,-4] + b*Sy[-1,-2]*Sy[-3,-4] + c*Sz[-1,-2]*Sz[-3,-4]
+        @tensor h[:] := a*Sx[-1,-2]*Sx[-3,-4] + b*Sy[-1,-2]*Sy[-3,-4] + c*Sz[-1,-2]*Sz[-3,-4] + (d*Sz[-1,-2]*SI[-3,-4] + d*SI[-1,-2]*Sz[-3,-4])/2
         return h
     end
 end
